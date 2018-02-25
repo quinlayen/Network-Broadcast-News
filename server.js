@@ -1,32 +1,37 @@
 const net = require('net');
 const PORT = 6969;
-let clientList = [];
+const clientList = [];
+const userNames = [];
 
 const server = net.createServer(client => {
-  //const name = client;
-  //console.log(name)
+  
   clientList.push(client);
-  console.log(`${clientList} is connected`);
-
+  //creates usernames from the clientList
+  clientList.map(element => {
+    userNames.push(`User ${clientList.indexOf(element)}`);
+  });
   client.on('data', data => {
-    //console.log(data.toString());
+    
+    
     broadcast(client, data.toString());
   });
   //sends a welcome to newly logged in clients
-  //const welcome = `Hello ${name}. Welcome to this amazing Chat Server\n`;
-  //client.write(welcome);
-
-  let broadcast = (sender, message) => {
+  const welcome = `Hello. Please enter a username.\nUse a '@' before your name i.e. @username`;
+  client.write(welcome);
+  
+  //broadcasts messages to all other users
+  const broadcast = (sender, message) => {
     clientList.forEach(clientName => {
-        if(clientName !== sender){
-      clientName.write(message);
-        }
+      if (clientName !== sender) {
+        clientName.write(message);
+      }
     });
   };
 
-
   client.on('end', () => {
-    console.log('client disconnected');
+    clientList.splice(clientList.indexOf(client), 1);
+    
+    //console.log(clientList);
   });
 });
 
